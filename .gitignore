@@ -1,5 +1,24 @@
 *.o
+*.os
 *.pyc
 *.aux
-# /src/
-/src/*.os
+.sconf_temp
+.sconsign.dblite
+config.log
+doc/*.tag
+doc/html
+doc/xml
+doc/doxygen.conf
+lib/libmops_daymops.*
+tests/.tests
+tests/Track-unitTests
+tests/detectionProximityUnitTests
+tests/fieldProximityUnitTests
+tests/findTracklets-unittests
+tests/generalUnitTests
+tests/linkTracklets-unittests
+tests/orbitProximityUnitTests
+ups/*.cfgc
+
+
+
