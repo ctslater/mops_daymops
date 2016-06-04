@@ -119,6 +119,7 @@ void debugPrintTrackSet(const TrackSet &tracks, const std::vector<MopsDetection>
  * created.
  * 
  */
+
 Track generateTrack(double ra0, double dec0, double raV, double decV,
                     double raAcc, double decAcc,
                     std::vector<std::vector <double> > trackletObsTimes,
@@ -184,8 +185,6 @@ Track generateTrack(double ra0, double dec0, double raV, double decV,
 
     return newTrack;
 }
-
-
 
 
 
@@ -321,6 +320,7 @@ BOOST_AUTO_TEST_CASE( linkTracklets_easy_2 )
 
   TrackSet * results = linkTracklets(myDets, pairs, myConfig);
 
+  std::cout << "linkTracklets_easy_2 results were sized " << results->size() << std::endl;
   BOOST_CHECK(results->size() == 10);
   delete results;
 }
@@ -381,7 +381,7 @@ BOOST_AUTO_TEST_CASE( linkTracklets_easy_1 )
   linkTrackletsConfig myConfig;
 
   TrackSet * results = linkTracklets(myDets, pairs, myConfig);
-  std::cout << "results were sized " << results->size() << std::endl;
+  std::cout << "linkTracklets_easy_1 results were sized " << results->size() << std::endl;
   BOOST_CHECK(results->size() == 1);
   delete results;
 }
