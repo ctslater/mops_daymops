@@ -50,7 +50,7 @@ void generatePerImageTrees(const std::map<double, std::vector<MopsDetection> > &
  * query point within a distance determined by maxVelocity.
  ******************************************************************/
 
-void getTracklets(TrackletVector &resultsVec,  
+void getTracklets(std::vector<Tracklet> &results,
 		  const std::map<double, KDTree<long int> > &myTreeMap,
 		  const std::vector<MopsDetection> &queryPoints,
 		  findTrackletsConfig config);
@@ -62,7 +62,7 @@ void getTracklets(TrackletVector &resultsVec,
 /*****************************************************************
  *The main function of this file.
  *****************************************************************/
-TrackletVector * findTracklets(const std::vector<MopsDetection> &myDets, 
+std::vector<Tracklet> * findTracklets(const std::vector<MopsDetection> &myDets,
                                findTrackletsConfig config)
 {
     //detection vectors, each vector of unique MJD
@@ -80,8 +80,10 @@ TrackletVector * findTracklets(const std::vector<MopsDetection> &myDets,
     generatePerImageTrees(detectionSets, myTreeMap);
 
     //get results
-    TrackletVector * resultsVec;
+    std::vector<Tracklet> * resultsVec;
 
+    resultsVec = new std::vector<Tracklet>;
+    /*
     if (config.outputMethod == RETURN_TRACKLETS) {
         resultsVec = new TrackletVector();
     }
@@ -95,10 +97,12 @@ TrackletVector * findTracklets(const std::vector<MopsDetection> &myDets,
         throw LSST_EXCEPT(BadParameterException, 
                           "findTracklets: got unknown or unimplemented output method.");
     }
+    */
 
     getTracklets(*resultsVec, myTreeMap, 
                  myDets, config);
 
+    /*
     if ((config.outputMethod == IDS_FILE) || 
         (config.outputMethod == IDS_FILE_WITH_CACHE)) {
 
@@ -106,8 +110,8 @@ TrackletVector * findTracklets(const std::vector<MopsDetection> &myDets,
         delete resultsVec;
         resultsVec = NULL;
     }
+    */
     
-
     return resultsVec;
 }
 
@@ -177,7 +181,7 @@ void generatePerImageTrees(const std::map<double, std::vector<MopsDetection> > &
  * index by file line number index, generate tracklets for each 
  * query point within a distance determined by maxVelocity.
  ******************************************************************/
-void getTracklets(TrackletVector &results,  
+void getTracklets(std::vector<Tracklet> &results,
 		  const std::map<double, KDTree<long int> > &myTreeMap,
 		  const std::vector<MopsDetection> &queryPoints,
 		  findTrackletsConfig config)

@@ -91,8 +91,7 @@ public:
  *****************************************************************/
 
 
-
-TrackletVector *
+std::vector<Tracklet> *
 findTracklets(const std::vector<MopsDetection> &allDetections, 
 	      findTrackletsConfig config);
 

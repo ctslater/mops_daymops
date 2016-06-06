@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_1 )
 {
   // call with empty dets
   std::vector<MopsDetection> myDets;
-  TrackletVector *pairs;
+  std::vector<Tracklet> *pairs;
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 1.5;
@@ -52,7 +52,7 @@ void addDetectionAt(double MJD, double RA, double dec,  std::vector<MopsDetectio
 
 //helper function for grading correctness
 
-bool containsPair(unsigned int ID1, unsigned int ID2, TrackletVector *pairs)
+bool containsPair(unsigned int ID1, unsigned int ID2, std::vector<Tracklet> *pairs)
 {
     for (unsigned int i = 0; i < pairs->size(); i++) {
         Tracklet curPair = pairs->at(i);
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_2 )
   config.maxV = 1.0;
   config.maxDt = 1.5;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   delete pairs;
 }
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_3 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 3);
   BOOST_CHECK(containsPair(0, 1, pairs));
   BOOST_CHECK(containsPair(0, 2, pairs));
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_4 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 2);
   BOOST_CHECK(containsPair(0, 1, pairs));
   BOOST_CHECK(containsPair(2, 3, pairs));
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_5 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_5_1 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_5_2 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_5_3 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_6 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_6_1 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_7 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_8 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_9 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_10 )
   findTrackletsConfig config;
   config.maxV = 1.0;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -351,7 +351,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_11 )
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_112)
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -397,7 +397,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_13 )
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 0);
   delete pairs;
 }
@@ -422,7 +422,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_14 )
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -481,7 +481,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_15 )
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 4);
   BOOST_CHECK(containsPair(0,  1, pairs));
   BOOST_CHECK(containsPair(5,  6, pairs));
@@ -505,7 +505,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_16 )
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 0);
   delete pairs;
 }
@@ -527,7 +527,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_17 )
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -549,7 +549,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_18 )
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(0, 1, pairs));
   delete pairs;
@@ -571,7 +571,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_19 )
   config.maxV = 1.0;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 0);
   delete pairs;
 }
@@ -605,7 +605,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_1 )
   config.minV = .5;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(2, 3, pairs));
   delete pairs;
@@ -632,7 +632,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_1_1 )
   config.maxV = 1.0;
   config.minV = .5;
   config.maxDt = 3.0;
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(2, 3, pairs));
   delete pairs;
@@ -660,7 +660,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_2 )
   config.minV = .5;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(2, 3, pairs));
   delete pairs;
@@ -688,7 +688,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_2_1 )
   config.minV = .5;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(2, 3, pairs));
   delete pairs;
@@ -715,7 +715,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_3 )
   config.minV = .5;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(2, 3, pairs));
   delete pairs;
@@ -743,7 +743,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_4 )
   config.minV = .5;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(2, 3, pairs));
   delete pairs;
@@ -773,7 +773,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_5 )
   config.minV = .5;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(2, 3, pairs));
   delete pairs;
@@ -803,7 +803,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_6 )
   config.minV = .5;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 1);
   BOOST_CHECK(containsPair(2, 3, pairs));
   delete pairs;
@@ -834,7 +834,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_7 )
   config.minV = .8;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 0);
   delete pairs;
 
@@ -893,7 +893,7 @@ BOOST_AUTO_TEST_CASE( findTracklets_blackbox_using_minv_8 )
   config.minV = .2;
   config.maxDt = 3.0;
 
-  TrackletVector *pairs = findTracklets(myDets, config);
+  std::vector<Tracklet> *pairs = findTracklets(myDets, config);
   BOOST_CHECK(pairs->size() == 2);
   BOOST_CHECK(containsPair(0,  1, pairs));
   //BOOST_CHECK(containsPair(5,  6, pairs));

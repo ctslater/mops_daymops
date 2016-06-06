@@ -1,3 +1,18 @@
 # -*- python -*-
 from lsst.sconsUtils import scripts
-scripts.BasicSConscript.lib()
+from SCons.Script import Glob
+
+# Need to avoid the pybind11 wrapper from being built into the library.
+# This is ugly, need a better long term solution.
+src_dirs = ["collapseTrackletsAndPostfilters",
+            "findTracklets",
+            "linkTracklets",
+            "detectionProximity",
+            "fieldProximity", 
+            "orbitProximity"]
+src = Glob("#src/*.cc")
+for directory in src_dirs:
+    src.extend(Glob("#src/%s/*.cc" % directory))
+
+print [s.path for s in src]
+scripts.BasicSConscript.lib(src=src)

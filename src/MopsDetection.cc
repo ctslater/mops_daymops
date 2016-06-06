@@ -6,9 +6,9 @@
 #include "lsst/mops/Exceptions.h"
 
 extern "C" {
-#include "slalib.h"
+// #include "slalib.h"
 }
-#include "slamac.h"
+// #include "slamac.h"
 
 #undef DEBUG
 
@@ -195,6 +195,10 @@ void MopsDetection::fromString(std::string diaStr) {
 
 void MopsDetection::calculateTopoCorr() {
 
+    RaTopoCorr = 0.0;
+    /*   Disabled due to missing slalib
+
+
     double obsLatRad, obsLongRad;
 
     obsLatRad = obsLat*DD2R;
@@ -238,6 +242,7 @@ void MopsDetection::calculateTopoCorr() {
 #ifdef DEBUG
     std::cerr << "topo_corr: " << MJD << ' ' << RA << ' ' << localAppSidTime << ' ' << RaTopoCorr << '\n';
 #endif
+    */
     
 }
 
