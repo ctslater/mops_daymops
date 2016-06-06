@@ -4,6 +4,7 @@
 #include "lsst/mops/MopsDetection.h"
 #include "lsst/mops/Tracklet.h"
 #include "lsst/mops/daymops/findTracklets/findTracklets.h"
+#include "lsst/mops/daymops/linkTracklets/linkTracklets.h"
 
 namespace py = pybind11;
 
@@ -58,6 +59,58 @@ PYBIND11_PLUGIN(daymops) {
         .def_readwrite("indices", &lsst::mops::Tracklet::indices)
         .def_readwrite("isCollapsed", &lsst::mops::Tracklet::isCollapsed);
 
+    // linkTracklets
+    py::class_<lsst::mops::linkTrackletsConfig>(m, "linkTrackletsConfig")
+        .def(py::init<>())
+        .def_readwrite("maxRAAccel", &lsst::mops::linkTrackletsConfig::maxRAAccel)
+        .def_readwrite("maxDecAccel", &lsst::mops::linkTrackletsConfig::maxDecAccel)
+        .def_readwrite("restrictTrackStartTimes",
+                &lsst::mops::linkTrackletsConfig::restrictTrackStartTimes)
+        .def_readwrite("latestFirstEndpointTime",
+                &lsst::mops::linkTrackletsConfig::latestFirstEndpointTime)
+        .def_readwrite("restrictTrackEndTimes",
+                &lsst::mops::linkTrackletsConfig::restrictTrackEndTimes)
+        .def_readwrite("earliestLastEndpointTime",
+                &lsst::mops::linkTrackletsConfig::earliestLastEndpointTime)
+        .def_readwrite("detectionLocationErrorThresh",
+                &lsst::mops::linkTrackletsConfig::detectionLocationErrorThresh)
+        .def_readwrite("trackAdditionThreshold",
+                &lsst::mops::linkTrackletsConfig::trackAdditionThreshold)
+        .def_readwrite("trackMaxRms",
+                &lsst::mops::linkTrackletsConfig::trackMaxRms)
+        .def_readwrite("minSupportToEndpointTimeSeparation",
+                &lsst::mops::linkTrackletsConfig::minSupportToEndpointTimeSeparation)
+        .def_readwrite("minEndpointTimeSeparation",
+                &lsst::mops::linkTrackletsConfig::minEndpointTimeSeparation)
+        .def_readwrite("minUniqueNights",
+                &lsst::mops::linkTrackletsConfig::minUniqueNights)
+        .def_readwrite("minDetectionsPerTrack",
+                &lsst::mops::linkTrackletsConfig::minDetectionsPerTrack)
+        .def_readwrite("leafSize",
+                &lsst::mops::linkTrackletsConfig::leafSize)
+        .def_readwrite("obsLat",
+                &lsst::mops::linkTrackletsConfig::obsLat)
+        .def_readwrite("obsLong",
+                &lsst::mops::linkTrackletsConfig::obsLong)
+        .def_readwrite("defaultAstromErr",
+                &lsst::mops::linkTrackletsConfig::defaultAstromErr)
+        .def_readwrite("trackMinProbChisq",
+                &lsst::mops::linkTrackletsConfig::trackMinProbChisq)
+        .def_readwrite("skyCenterRa",
+                &lsst::mops::linkTrackletsConfig::skyCenterRa);
+
+    m.def("linkTracklets", &lsst::mops::linkTracklets,
+            py::arg("allDetections"), py::arg("queryTracklets"), py::arg("searchConfig"));
+
+    m.def("modifyWithAcceleration", &lsst::mops::modifyWithAcceleration,
+        py::arg("position"), py::arg("velocity"), py::arg("acceleration"), py::arg("time"));
+
+    m.def("findLinkableObjects", &lsst::mops::findLinkableObjects,
+            py::arg("allDetections"), py::arg("allTracklets"), py::arg("searchConfig"),
+            py::arg("findableObjectNames"));
+
+    m.def("calculateTopoCorr", &lsst::mops::calculateTopoCorr,
+            py::arg("allDetections"), py::arg("searchConfig"));
 
     return m.ptr();
 }
