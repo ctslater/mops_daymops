@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     lsst::mops::findTrackletsConfig config;
     config.maxV = maxVelocity;
     config.minV = minVelocity;
-    config.outputMethod = lsst::mops::IDS_FILE_WITH_CACHE;
+    config.outputMethod = lsst::mops::trackletOutputMethod::IDS_FILE_WITH_CACHE;
     config.outputFile = outFileName;
     // hold up to 1 GB before purging.
     config.outputBufferSize = 1073741824;

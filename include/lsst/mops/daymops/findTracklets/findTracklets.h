@@ -28,9 +28,9 @@ namespace lsst {
 * the fields if you're doing something special.
 *******************************************************************************/
 
-enum trackletOutputMethod { RETURN_TRACKLETS = 0, 
-                            IDS_FILE,
-                            IDS_FILE_WITH_CACHE};
+enum class trackletOutputMethod { RETURN_TRACKLETS = 0,
+                                  IDS_FILE,
+                                  IDS_FILE_WITH_CACHE};
         
 class findTrackletsConfig {
 public:
@@ -41,7 +41,7 @@ public:
             minDt = .01; //14.4 minutes
             maxV = 2.0;
             minV = 0.0;
-            outputMethod = RETURN_TRACKLETS;
+            outputMethod = trackletOutputMethod::RETURN_TRACKLETS;
             outputFile = "";
             outputBufferSize = 0;
         }

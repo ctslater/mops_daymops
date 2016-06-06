@@ -14,9 +14,9 @@
 namespace lsst {
     namespace mops {
 
-enum trackOutputMethod { RETURN_TRACKS = 0, 
-                         IDS_FILE,
-                         IDS_FILE_WITH_CACHE};
+enum class trackOutputMethod { RETURN_TRACKS = 0,
+                               IDS_FILE,
+                               IDS_FILE_WITH_CACHE};
 
 
 /* use settings in this class to declare the verbosity of
@@ -102,7 +102,7 @@ public:
 
             // options for how to write output - return tracks, or write them
             // semi-continuously to disk?
-            outputMethod = RETURN_TRACKS;
+            outputMethod = trackOutputMethod::RETURN_TRACKS;
             outputFile = "";
             outputBufferSize = 0;
 

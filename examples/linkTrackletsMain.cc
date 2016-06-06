@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
      std::vector<lsst::mops::MopsDetection> allDets;
      std::vector<lsst::mops::Tracklet> allTracklets;
      lsst::mops::TrackSet * resultTracks;
-     searchConfig.outputMethod = lsst::mops::IDS_FILE_WITH_CACHE;
+     searchConfig.outputMethod = lsst::mops::trackOutputMethod::IDS_FILE_WITH_CACHE;
      searchConfig.outputBufferSize = bufferSize;
      
      
