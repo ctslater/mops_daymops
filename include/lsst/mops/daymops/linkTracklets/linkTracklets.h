@@ -293,6 +293,11 @@ void modifyWithAcceleration(double &position, double &velocity,
 void calculateTopoCorr(std::vector<MopsDetection> &allDetections,
                        const linkTrackletsConfig &searchConfig);
 
+void findLinkableObjects(const std::vector<MopsDetection> & allDets,
+                         const std::vector<Tracklet> &allTracklets,
+                         linkTrackletsConfig searchConfig,
+                         std::vector<int> &findableObjectNames);
+
     }} // close lsst::mops
 
 #endif 
