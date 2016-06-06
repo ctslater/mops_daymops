@@ -17,28 +17,28 @@ PYBIND11_PLUGIN(daymops) {
         .def(py::init<long int, double, double, double, double, double, int, long int, double, double>(),
                 py::arg("ID"), py::arg("epochMJD"), py::arg("RA"), py::arg("Dec"),
                 py::arg("RaErr") = 0.0, py::arg("DecErr") = 0.0, py::arg("ssmId") = -1,
-                py::arg("obsHistId") = -1, py::arg("snr") = -1, py::arg("mag") = -1) 
+                py::arg("obsHistId") = -1, py::arg("snr") = -1, py::arg("mag") = -1)
         .def("fromString", &lsst::mops::MopsDetection::fromString)
         .def("calculateTopoCorr", &lsst::mops::MopsDetection::calculateTopoCorr)
-        .def_property("ID", &lsst::mops::MopsDetection::getID, 
+        .def_property("ID", &lsst::mops::MopsDetection::getID,
                 &lsst::mops::MopsDetection::setID)
-        .def_property("ImageID", &lsst::mops::MopsDetection::getImageID, 
+        .def_property("ImageID", &lsst::mops::MopsDetection::getImageID,
                 &lsst::mops::MopsDetection::setImageID)
-        .def_property("EpochMJD", &lsst::mops::MopsDetection::getEpochMJD, 
+        .def_property("EpochMJD", &lsst::mops::MopsDetection::getEpochMJD,
                 &lsst::mops::MopsDetection::setEpochMJD)
-        .def_property("RA", &lsst::mops::MopsDetection::getRA, 
+        .def_property("RA", &lsst::mops::MopsDetection::getRA,
                 &lsst::mops::MopsDetection::setRA)
-        .def_property("Dec", &lsst::mops::MopsDetection::getDec, 
+        .def_property("Dec", &lsst::mops::MopsDetection::getDec,
                 &lsst::mops::MopsDetection::setDec)
-        .def_property("Mag", &lsst::mops::MopsDetection::getMag, 
+        .def_property("Mag", &lsst::mops::MopsDetection::getMag,
                 &lsst::mops::MopsDetection::setMag)
-        .def_property("SNR", &lsst::mops::MopsDetection::getSNR, 
+        .def_property("SNR", &lsst::mops::MopsDetection::getSNR,
                 &lsst::mops::MopsDetection::setSNR)
-        .def_property("RaErr", &lsst::mops::MopsDetection::getRaErr, 
+        .def_property("RaErr", &lsst::mops::MopsDetection::getRaErr,
                 &lsst::mops::MopsDetection::setRaErr)
-        .def_property("DecErr", &lsst::mops::MopsDetection::getDecErr, 
+        .def_property("DecErr", &lsst::mops::MopsDetection::getDecErr,
                 &lsst::mops::MopsDetection::setDecErr)
-        .def_property_readonly("RaTopoCorr", &lsst::mops::MopsDetection::getRaTopoCorr); 
+        .def_property_readonly("RaTopoCorr", &lsst::mops::MopsDetection::getRaTopoCorr);
 
     // findTrackletsConfig
     py::class_<lsst::mops::findTrackletsConfig>(m, "findTrackletsConfig")
