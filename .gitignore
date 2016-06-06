@@ -18,6 +18,14 @@ tests/findTracklets-unittests
 tests/generalUnitTests
 tests/linkTracklets-unittests
 tests/orbitProximityUnitTests
+examples/collapseTrackletsMain
+examples/fieldProximityMain
+examples/findLinkableObjectsMain
+examples/findTrackletsMain
+examples/linkTrackletsMain
+examples/orbitProximityMain
+examples/readTracksWriteStats
+examples/removeSubsetsMain
 ups/*.cfgc
 
 

@@ -4,10 +4,12 @@
 #include <unistd.h>
 #include <getopt.h>
 
-#include "SubsetRemover.h"
+#include "lsst/mops/removeSubsets.h"
+#include "lsst/mops/common.h"
+#include "lsst/mops/Exceptions.h"
+#include "lsst/mops/fileUtils.h"
 
 
-namespace ctExcept = collapseTracklets::exceptions;
 namespace removeSubsets {
 
     int removeSubsetsMain(int argc, char** argv) {
@@ -16,8 +18,8 @@ namespace removeSubsets {
         std::string USAGE("USAGE: removeSubsets --inFile <input pairfile> --outFile <output pairfile> [--removeSubsets <TRUE/FALSE> --keepOnlyLongest <TRUE/FALSE>]");
         std::ifstream inFile;
         std::ofstream outFile;
-        std::vector <Tracklet>* pairsVector = new std::vector<Tracklet>;
-        std::vector <Tracklet>* outputVector = new std::vector<Tracklet>;
+        std::vector <lsst::mops::Tracklet>* pairsVector = new std::vector<lsst::mops::Tracklet>;
+        std::vector <lsst::mops::Tracklet>* outputVector = new std::vector<lsst::mops::Tracklet>;
 
         char* inFileName = NULL;
         char* outFileName = NULL;
@@ -47,11 +49,11 @@ namespace removeSubsets {
                 break;
                 
             case 'r':
-                removeSubsets = KDTree::Common::guessBoolFromStringOrGiveErr(optarg, USAGE);
+                removeSubsets = lsst::mops::guessBoolFromStringOrGiveErr(optarg, USAGE);
                 break;
                 
             case 'k':
-                keepOnlyLongestPerDet = KDTree::Common::guessBoolFromStringOrGiveErr(optarg, USAGE);
+                keepOnlyLongestPerDet = lsst::mops::guessBoolFromStringOrGiveErr(optarg, USAGE);
                 break;
                 
             case 'h':   /* fall-through is intentional */
@@ -60,14 +62,14 @@ namespace removeSubsets {
                 return 0;
                 break;
             default:
-                throw LSST_EXCEPT(ctExcept::ProgrammerErrorException, "Programmer error in parsing of command-line options\n");
+                throw LSST_EXCEPT(ProgrammerErrorException, "Programmer error in parsing of command-line options\n");
                 break;
             }        
             opt = getopt_long( argc, argv, optString, longOpts, &longIndex );
         }
 
         if ((inFileName == NULL) || (outFileName == NULL)) {
-            throw LSST_EXCEPT(ctExcept::CommandlineParseErrorException, 
+            throw LSST_EXCEPT(CommandlineParseErrorException, 
                               "Please specify input and output filenames.\n\n" +
                               USAGE + "\n");
         }
@@ -77,28 +79,26 @@ namespace removeSubsets {
         std::cout << "---------------" << std::endl;
         std::cout << "Input file:                                  " << inFileName << std::endl;
         std::cout << "Output file:                                 " << outFileName << std::endl;
-        std::cout << "RemoveSubsets:                               "<< KDTree::Common::boolToString(removeSubsets)
+        std::cout << "RemoveSubsets:                               "<< lsst::mops::boolToString(removeSubsets)
                   << std::endl;
         std::cout << "Keep only longest tracklet(s) per detection: "<< 
-            KDTree::Common::boolToString(keepOnlyLongestPerDet) << std::endl;
-
-        collapseTracklets::TrackletCollapser myTC;
+            lsst::mops::boolToString(keepOnlyLongestPerDet) << std::endl;
 
         inFile.open(inFileName);
         outFile.open(outFileName);
-        myTC.populatePairsVectorFromFile(inFile, *pairsVector);
+        lsst::mops::populatePairsVectorFromFile(inFile, *pairsVector);
 
         /* do the actual work */
 
         if (keepOnlyLongestPerDet == true) {
-            std::vector <Tracklet>* tmpVector = 
-                new std::vector<Tracklet>;
+            std::vector <lsst::mops::Tracklet>* tmpVector = 
+                new std::vector<lsst::mops::Tracklet>;
             putLongestPerDetInOutputVector(pairsVector, *tmpVector); 
             delete pairsVector;
             pairsVector = tmpVector;
         }
 
-        SubsetRemover mySR;
+        lsst::mops::SubsetRemover mySR;
         
         if (removeSubsets == true) {
             mySR.removeSubsetsPopulateOutputVector(pairsVector, *outputVector);
@@ -108,7 +108,7 @@ namespace removeSubsets {
             outputVector = pairsVector;
         }
 
-        myTC.writeTrackletsToOutFile(outputVector, outFile);
+        lsst::mops::writeTrackletsToOutFile(outputVector, outFile);
         if (outputVector != pairsVector) {
             delete outputVector;
         }
@@ -119,5 +119,5 @@ namespace removeSubsets {
 }
 
 int main(int argc, char** argv) {
-    CALL_AND_CATCH_EXCEPTIONS(return removeSubsets::removeSubsetsMain(argc, argv));
+    return removeSubsets::removeSubsetsMain(argc, argv);
 }
