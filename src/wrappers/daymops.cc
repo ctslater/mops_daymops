@@ -5,12 +5,15 @@
 #include "lsst/mops/Tracklet.h"
 #include "lsst/mops/daymops/findTracklets/findTracklets.h"
 #include "lsst/mops/daymops/linkTracklets/linkTracklets.h"
+#include "lsst/mops/daymops/collapseTrackletsAndPostfilters/collapseTracklets.h"
 
 namespace py = pybind11;
 
+PYBIND11_MAKE_OPAQUE(std::vector<lsst::mops::Tracklet>);
 
 PYBIND11_PLUGIN(daymops) {
     py::module m("daymops", "mops_daymops module");
+
 
     py::class_<lsst::mops::MopsDetection>(m, "MopsDetection")
         .def(py::init<>())
@@ -55,8 +58,18 @@ PYBIND11_PLUGIN(daymops) {
 
     py::class_<lsst::mops::Tracklet>(m, "Tracklet")
         .def(py::init<>())
-        .def(py::init<std::set<unsigned int>>(), py::arg("startIndices"))
-        .def_readwrite("indices", &lsst::mops::Tracklet::indices)
+        .def("__init__", [](lsst::mops::Tracklet &t, py::list startIndices) {
+                new (&t) lsst::mops::Tracklet();
+                for (auto value : startIndices) {
+                    (&t)->indices.insert(value.cast<unsigned int>());
+                    }
+        })
+        // Since we can't edit indices from python, exposing this as a function
+        // to discourage anyone from trying.
+        //.def_readonly("indices", &lsst::mops::Tracklet::indices)
+        .def("indices", [](lsst::mops::Tracklet &t) {
+                return py::cast((&t)->indices);
+                })
         .def_readwrite("isCollapsed", &lsst::mops::Tracklet::isCollapsed);
 
     // linkTracklets
@@ -111,6 +124,40 @@ PYBIND11_PLUGIN(daymops) {
 
     m.def("calculateTopoCorr", &lsst::mops::calculateTopoCorr,
             py::arg("allDetections"), py::arg("searchConfig"));
+
+    // collapseTracklets
+    m.def("doCollapsingPopulateOutputVector",  &lsst::mops::doCollapsingPopulateOutputVector,
+            py::arg("detections"), py::arg("tracklets"), py::arg("tolerances"),
+            py::arg("collapsedPairs"), py::arg("useMinimumRMS"),
+            py::arg("useBestFit"), py::arg("useRMSFilt"), py::arg("maxRMS"),
+            py::arg("beVerbose"));
+
+
+    // Defining a typedef to avoid very lengthy lines in the wrapping code.
+    typedef std::vector<lsst::mops::Tracklet> PyTrackletSet;
+
+    py::class_<std::vector<lsst::mops::Tracklet>>(m, "TrackletSet")
+        .def(py::init<>())
+        .def("__init__", [](PyTrackletSet &v, py::list l) {
+                new (&v) PyTrackletSet();
+                for (auto item : l)
+                    (&v)->push_back(item.cast<lsst::mops::Tracklet>());
+        })
+        .def("append", (void (PyTrackletSet::*)(const lsst::mops::Tracklet &))
+                        &PyTrackletSet::push_back)
+        //.def("__add__", &std::vector<lsst::mops::Tracklet>::push_back)
+        //.def("__iadd__", &std::vector<lsst::mops::Tracklet>::push_back)
+         .def("__getitem__", [](const PyTrackletSet &v, size_t i) {
+            if (i >= v.size())
+                throw py::index_error();
+            return v[i];
+        })
+        .def("__len__", [](const PyTrackletSet &v) { return v.size(); })
+        .def("__iter__", [](PyTrackletSet &v) {
+           return py::make_iterator(v.begin(), v.end());
+        }, py::keep_alive<0, 1>());
+
+
 
     return m.ptr();
 }

@@ -27,6 +27,7 @@ kwds = dict(
         os.path.join('..', 'include'),
         os.path.join('include'),
         os.path.join('/Users/ctslater/lsstsw/stack/DarwinX86/pex_exceptions/2016_01.0+3/include'),
+        os.path.join('/Users/ctslater/lsstsw/stack/DarwinX86/eigen/3.2.5-1-g70497dd/include'),
         os.path.dirname(locations.distutils_scheme('pybind11')['headers'])
     ],
 )

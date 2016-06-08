@@ -6,7 +6,7 @@ import lsst.mops.daymops as daymops
 def containsPair(id1, id2, tracklet_list):
 
     for tracklet in tracklet_list:
-        if id1 in tracklet.indices and id2 in tracklet.indices:
+        if id1 in tracklet.indices() and id2 in tracklet.indices():
             return True
     return False
 

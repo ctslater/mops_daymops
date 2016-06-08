@@ -36,7 +36,11 @@ namespace lsst {
                                          std::vector<double> &DecSlopeAndOffsetOut,
                                          double timeOffset) {
         unsigned int numDets = (*trackletDets).size();
-        
+
+        if (numDets == 0)
+            throw LSST_EXCEPT(BadParameterException,
+                    "leastSquaresSolveForRADecLinear: no detections were passed.\n");
+
         std::vector<double> MJDs(numDets);
         std::vector<double> RAs(numDets);
         std::vector<double> Decs(numDets);
