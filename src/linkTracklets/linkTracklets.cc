@@ -337,7 +337,7 @@ void recenterDetections(std::vector<MopsDetection> &allDetections,
     double maxRa = centerRa;
     double minDec = centerDec;
     double maxDec = centerDec;
-    for (unsigned int i = 1; i < allDetections.size(); i++) {
+    for (unsigned int i = 0; i < allDetections.size(); i++) {
         double thisRa, thisDec;
         thisRa  = allDetections[i].getRA();
         thisDec = allDetections[i].getDec();
