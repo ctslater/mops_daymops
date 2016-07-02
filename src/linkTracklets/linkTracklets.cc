@@ -410,11 +410,21 @@ void setTrackletVelocities(
 
 }
 
-
-
-
-
-
+/*
+ * update position and velocity given acceleration over time.
+ */
+void modifyWithAcceleration(double &position, double &velocity, 
+                            double acceleration, double time)
+{
+    //double start = std::clock();
+    // use good ol' displacement = vt + .5a(t^2) 
+    double newPosition = position + velocity*time 
+        + .5*acceleration*(time*time);
+    double newVelocity = velocity + acceleration*time;
+    position = newPosition;
+    velocity = newVelocity;
+    // modifyWithAccelerationTime += timeSince(start);
+}
 
 void makeTrackletTimeToTreeMap(
     const std::vector<MopsDetection> &allDetections,
@@ -1766,15 +1776,15 @@ TrackSet* linkTracklets(std::vector<MopsDetection> &allDetections,
                         std::vector<Tracklet> &queryTracklets,
                         const linkTrackletsConfig &searchConfig) {
     TrackSet * toRet;
-    if (searchConfig.outputMethod == RETURN_TRACKS) {
+    if (searchConfig.outputMethod == trackOutputMethod::RETURN_TRACKS) {
         toRet = new TrackSet();
     }
-    else if (searchConfig.outputMethod == IDS_FILE) {
+    else if (searchConfig.outputMethod == trackOutputMethod::IDS_FILE) {
         toRet = new TrackSet(searchConfig.outputFile, 
                              false, 
                              0);
     }
-    else if (searchConfig.outputMethod == IDS_FILE_WITH_CACHE) {
+    else if (searchConfig.outputMethod == trackOutputMethod::IDS_FILE_WITH_CACHE) {
         toRet = new TrackSet(searchConfig.outputFile, 
                              true, 
                              searchConfig.outputBufferSize);
