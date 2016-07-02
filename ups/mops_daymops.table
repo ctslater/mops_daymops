@@ -7,6 +7,10 @@ setupRequired(pex_exceptions)
 setupRequired("eigen" >=3.0.0)
 setupRequired("mysqlpython")
 setupRequired("numpy")
+setupRequired("afw")
+# For tasks
+setupRequired("pipe_base")
+setupRequired("pipe_tasks")
 
 envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)

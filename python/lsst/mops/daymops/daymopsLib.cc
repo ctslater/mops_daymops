@@ -3,6 +3,7 @@
 
 #include "lsst/mops/MopsDetection.h"
 #include "lsst/mops/Tracklet.h"
+#include "lsst/mops/Track.h"
 #include "lsst/mops/daymops/findTracklets/findTracklets.h"
 #include "lsst/mops/daymops/linkTracklets/linkTracklets.h"
 #include "lsst/mops/daymops/collapseTrackletsAndPostfilters/collapseTracklets.h"
@@ -11,8 +12,8 @@ namespace py = pybind11;
 
 PYBIND11_MAKE_OPAQUE(std::vector<lsst::mops::Tracklet>);
 
-PYBIND11_PLUGIN(daymops) {
-    py::module m("daymops", "mops_daymops module");
+PYBIND11_PLUGIN(_daymopsLib) {
+    py::module m("_daymopsLib", "mops_daymops C++ wrapper module");
 
 
     py::class_<lsst::mops::MopsDetection>(m, "MopsDetection")
@@ -22,6 +23,7 @@ PYBIND11_PLUGIN(daymops) {
                 py::arg("RaErr") = 0.0, py::arg("DecErr") = 0.0, py::arg("ssmId") = -1,
                 py::arg("obsHistId") = -1, py::arg("snr") = -1, py::arg("mag") = -1)
         .def("fromString", &lsst::mops::MopsDetection::fromString)
+        .def("toString", [](lsst::mops::MopsDetection &d) { return "<MopsDetection " + std::to_string((&d)->getID()) + " >"; })
         .def("calculateTopoCorr", &lsst::mops::MopsDetection::calculateTopoCorr)
         .def_property("ID", &lsst::mops::MopsDetection::getID,
                 &lsst::mops::MopsDetection::setID)
@@ -110,7 +112,16 @@ PYBIND11_PLUGIN(daymops) {
         .def_readwrite("trackMinProbChisq",
                 &lsst::mops::linkTrackletsConfig::trackMinProbChisq)
         .def_readwrite("skyCenterRa",
-                &lsst::mops::linkTrackletsConfig::skyCenterRa);
+                &lsst::mops::linkTrackletsConfig::skyCenterRa)
+        .def_readwrite("myVerbosity",
+                &lsst::mops::linkTrackletsConfig::myVerbosity);
+
+    py::class_<lsst::mops::linkTrackletsVerbositySettings>(m, "linkTrackletsVerbositySettings")
+        .def(py::init<>())
+        .def_readwrite("printStatus", &lsst::mops::linkTrackletsVerbositySettings::printStatus)
+        .def_readwrite("printVisitCounts", &lsst::mops::linkTrackletsVerbositySettings::printStatus)
+        .def_readwrite("printTimesByCategory", &lsst::mops::linkTrackletsVerbositySettings::printStatus)
+        .def_readwrite("printBoundsInfo", &lsst::mops::linkTrackletsVerbositySettings::printStatus);
 
     m.def("linkTracklets", &lsst::mops::linkTracklets,
             py::arg("allDetections"), py::arg("queryTracklets"), py::arg("searchConfig"));
@@ -147,7 +158,7 @@ PYBIND11_PLUGIN(daymops) {
                         &PyTrackletSet::push_back)
         //.def("__add__", &std::vector<lsst::mops::Tracklet>::push_back)
         //.def("__iadd__", &std::vector<lsst::mops::Tracklet>::push_back)
-         .def("__getitem__", [](const PyTrackletSet &v, size_t i) {
+        .def("__getitem__", [](const PyTrackletSet &v, size_t i) {
             if (i >= v.size())
                 throw py::index_error();
             return v[i];
@@ -157,7 +168,33 @@ PYBIND11_PLUGIN(daymops) {
            return py::make_iterator(v.begin(), v.end());
         }, py::keep_alive<0, 1>());
 
+    m.def("paramterizeTracklet", [](py::list trackletDets,
+                double normalTime) {
+            std::vector<double> motionVector;
+            const std::vector<lsst::mops::MopsDetection> &tmp = trackletDets.cast<std::vector<lsst::mops::MopsDetection>>();
+            lsst::mops::parameterize(&tmp,
+                    motionVector, normalTime);
+            return py::cast(motionVector);
+            });
 
+    // This is a copy of TrackletSet for Tracks.
+    // There must be some way to combine this boilerplate for list-like
+    // containers.
+    py::class_<lsst::mops::TrackSet>(m, "TrackSet")
+        .def(py::init<>())
+        .def("toString", [](lsst::mops::TrackSet &d) { return "<TrackSet>"; })
+        .def("__len__", &lsst::mops::TrackSet::size)
+        .def("__iter__", [](lsst::mops::TrackSet &v) {
+           return py::make_iterator(v.componentTracks.begin(), v.componentTracks.end());
+        }, py::keep_alive<0, 1>());
+
+    py::class_<lsst::mops::Track>(m , "Track")
+        .def("detectionIndices", &lsst::mops::Track::getComponentDetectionIndices)
+        .def("diaIds", &lsst::mops::Track::getComponentDetectionDiaIds)
+        .def("trackletIndices", &lsst::mops::Track::getComponentDetectionDiaIds)
+        .def("trackletIndices", [](lsst::mops::Track &t) {
+                return py::cast((&t)->componentTrackletIndices);
+                });
 
     return m.ptr();
 }

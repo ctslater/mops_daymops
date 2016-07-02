@@ -27,6 +27,7 @@ examples/orbitProximityMain
 examples/readTracksWriteStats
 examples/removeSubsetsMain
 ups/*.cfgc
+python/lsst/mops/daymops/_daymopsLib.so
 
 
 
