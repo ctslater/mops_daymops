@@ -76,7 +76,7 @@ private:
     double dec;
     double RaErr;
     double DecErr;
-    double RaTopoCorr;
+    double RaTopoCorr = 0.0;
     int ssmId;
     long int imageID;
     double mag;
