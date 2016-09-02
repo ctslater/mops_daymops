@@ -65,6 +65,7 @@ bool trackletIsCorrect(const std::vector<MopsDetection> & allDets,
     std::string inferredName = "";
     std::set<unsigned int>::const_iterator detIter;
 
+    /* getObjName is a MitiDetection thing, doesn't exist for MopsDetection
 
     for (detIter = t.indices.begin(); detIter != t.indices.end(); detIter++) {
 
@@ -81,6 +82,8 @@ bool trackletIsCorrect(const std::vector<MopsDetection> & allDets,
         }
 
     }
+
+    */
     return true;
 }
 
@@ -107,12 +110,17 @@ MJD firstDetectionTime(const std::vector<MopsDetection> & allDets,
 void findLinkableObjects(const std::vector<MopsDetection> & allDets, 
                          const std::vector<Tracklet> &allTracklets, 
                          linkTrackletsConfig searchConfig, 
-                         std::vector<std::string> &findableObjectNames) 
+                         std::vector<int> &findableObjectNames) 
 {
 
+    //
+    // CTS: Switched getObjName() to getSsmId(), but I'm not sure that SsmId's
+    // are the same logical thing as ObjNames.
+    //
+
     //consider only detections which come from correct tracklets
-    std::map<std::string, std::set<MJD> > nameToObsTimesMap;
-    std::map<std::string, std::set<unsigned int> > nameToTrackletsMap;
+    std::map<int, std::set<MJD> > nameToObsTimesMap;
+    std::map<int, std::set<unsigned int> > nameToTrackletsMap;
     
     //get mappings from name to all observation times and name to all component tracklets.
     for (unsigned int trackletI = 0; trackletI != allTracklets.size(); trackletI++) {
@@ -123,7 +131,7 @@ void findLinkableObjects(const std::vector<MopsDetection> & allDets,
                 
             for (detIter = curTracklet->indices.begin(); detIter != curTracklet->indices.end(); detIter++) {
                     
-                std::string objName = allDets.at(*detIter).getObjName();
+                int objName = allDets.at(*detIter).getSsmId();
                 
                 nameToObsTimesMap[objName].insert(allDets.at(*detIter).getEpochMJD());
                 nameToTrackletsMap[objName].insert(trackletI);
@@ -134,7 +142,7 @@ void findLinkableObjects(const std::vector<MopsDetection> & allDets,
 
 
     // iterate through each object and see if its tracklets are legal.
-    std::map<std::string, std::set<unsigned int> >::const_iterator objAndTrackletIter;
+    std::map<int, std::set<unsigned int> >::const_iterator objAndTrackletIter;
     for (objAndTrackletIter = nameToTrackletsMap.begin(); 
          objAndTrackletIter != nameToTrackletsMap.end();
          objAndTrackletIter++) {
@@ -200,9 +208,10 @@ void findLinkableObjects(const std::vector<MopsDetection> & allDets,
             }
            
             // we now have the set of all compatible detections/tracklet. check to see if there are enough.
-            if ((idealTrackDetTimes.size() > searchConfig.minDetectionsPerTrack) 
-                && 
-                (idealTrackTrackletIndices.size() - 2 > searchConfig.minSupportTracklets)){
+
+            // CTS: linkTrackletsConfig has no member minSupportTracklets
+            // (idealTrackTrackletIndices.size() - 2 > searchConfig.minSupportTracklets)
+            if (idealTrackDetTimes.size() > searchConfig.minDetectionsPerTrack) {
                 // track is valid - add object name to output
                 findableObjectNames.push_back(objAndTrackletIter->first);
             }
