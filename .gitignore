@@ -28,6 +28,7 @@ examples/readTracksWriteStats
 examples/removeSubsetsMain
 ups/*.cfgc
 python/lsst/mops/daymops/_daymopsLib.so
+python/lsst/mops/daymops/version.py
 bin/makeTracklets.py
 
 
