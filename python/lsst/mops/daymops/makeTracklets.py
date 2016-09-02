@@ -6,14 +6,13 @@ import sys
 import lsst.afw.geom as afwGeom
 import lsst.pipe.base as pipeBase
 import lsst.pex.config as pexConfig
-from lsst.pipe.tasks.selectImages import WcsSelectImagesTask
 from lsst.pipe.base import ArgumentParser, TaskError
 from lsst.daf.base import DateTime
 import traceback
 
 import numpy as np
 
-from . import findTracklets, findTrackletsConfig, MopsDetection
+from . import findTracklets, findTrackletsConfig, MopsDetection, TrackletSet, doCollapsingPopulateOutputVector
 
 from astropy.io import ascii
 
@@ -34,11 +33,6 @@ class MakeTrackletsConfig(pexConfig.Config):
                             dtype=float,
                             default=0.0)
 
-    select = pexConfig.ConfigurableField(
-        doc = "Image selection subtask.",
-        target = WcsSelectImagesTask,
-    )
-
     def getFindTrackletsConfig(self):
         output_config = findTrackletsConfig()
         for field_name, field_value in self.iteritems():
@@ -47,25 +41,11 @@ class MakeTrackletsConfig(pexConfig.Config):
         return output_config
 
 
-def getDetections():
-    detection_table = ascii.read("night1")
-    detections = [MopsDetection(id, mjd, ra, dec, obsHistId=imgId, snr=snr) for
-                  (id, mjd, ra, dec, imgId, snr) in
-                  zip(xrange(len(detection_table)), detection_table['MJD'],
-                      detection_table['coord_ra'],
-                      detection_table['coord_dec'],
-                      detection_table['visitid'],
-                      detection_table['SNR'])]
-    return detections
-
-
 class MakeTrackletsTaskRunner(pipeBase.TaskRunner):
 
 
     @staticmethod
     def getTargetList(parsedCmd, **kwargs):
-        #argDict = dict(calExpList=parsedCmd.calexp.idList)
-        #return [(dataId, argDict) for dataId in parsedCmd.id.idList]
         return [parsedCmd.id.refList]
 
 
@@ -98,17 +78,36 @@ class MakeTrackletsTask(pipeBase.CmdLineTask):
 
     def __init__(self, *args, **kwargs):
         pipeBase.Task.__init__(self, *args, **kwargs)
-        self.makeSubtask("select")
 
     def make_detections(self, catalog, visit, mjd):
         SNR = catalog['slot_PsfFlux_flux']/catalog['slot_PsfFlux_fluxSigma']
         detections = [MopsDetection(id, mjd, ra, dec, obsHistId=visit, snr=snr) for
                       (id, ra, dec, snr) in
-                      zip(catalog['id'],
+                      zip(catalog['id'] % 10000,
                           np.degrees(catalog['coord_ra']),
                           np.degrees(catalog['coord_dec']),
                           SNR)]
+        print(np.min(np.degrees(catalog['coord_ra'])),
+              np.max(np.degrees(catalog['coord_ra'])),
+                          np.min(np.degrees(catalog['coord_dec'])),
+                          np.max(np.degrees(catalog['coord_dec'])))
         return detections
+
+    def write_out_tracklets(self, tracklets, output_filename):
+
+        f_out = open(output_filename, "w")
+        for tracklet in tracklets:
+            indices = list(tracklet.indices())
+            detection_params = []
+            for det_index in indices:
+                visit_str = "{:d},{:f},{:f},{:.1f}".format(detection_table['visitid'][det_index],
+                                                           detection_table['coord_ra'][det_index],
+                                                           detection_table['coord_dec'][det_index],
+                                                           detection_table['SNR'][det_index])
+                detection_params.append(visit_str)
+            output_string = ",".join(detection_params)
+            print(output_string, file=f_out)
+        f_out.close()
 
 
     @pipeBase.timeMethod
@@ -125,25 +124,32 @@ class MakeTrackletsTask(pipeBase.CmdLineTask):
             detections.extend(self.make_detections(catalog, visit, exposure_mjd))
 
         tracklets = findTracklets(detections, self.config.getFindTrackletsConfig())
-        print("Number of tracklets: {:d}".format(len(tracklets)))
-        return pipeBase.Struct(tracklets=tracklets)
+        print("Number of uncollapsed tracklets: {:d}".format(len(tracklets)))
 
-        sys.exit(0)
 
-        skyInfo = self.getSkyInfo(dataRef)
-        # calExpRefList = self.selectExposures(dataRef, skyInfo, selectDataList=selectDataList)
+        # Need to convert these to config settings
+        # Tolerances in RA, Dec, Angle, Velocity
+        tolerances = [0.002, 0.002, 5, 0.05]
+        useMinimumRMS = False
+        useBestFit = False
+        useRMSFilt = False
+        verbose = False
+        maxRMS = 0.001
 
-        skyInfo = self.getSkyInfo(dataRef)
-        cornerPosList = afwGeom.Box2D(skyInfo.bbox).getCorners()
-        coordList = [skyInfo.wcs.pixelToSky(pos) for pos in cornerPosList]
-        selected_exposures = self.select.runDataRef(dataRef, coordList,
-                                                    selectDataList=selectDataList).dataRefList
-        print("Selected Exposures ", selected_exposures)
+        collapsed_tracklets = TrackletSet()
+        doCollapsingPopulateOutputVector(detections, tracklets,
+                                         tolerances,
+                                         collapsed_tracklets,
+                                         useMinimumRMS, useBestFit, useRMSFilt,
+                                         maxRMS, verbose)
+        print("Number of collapsed tracklets: {:d}".format(len(collapsed_tracklets)))
 
-        detections = getDetections()
-        tracklets = findTracklets(detections, self.config.getFindTrackletsConfig())
-        print("Number of tracklets: {:d}".format(len(tracklets)))
-        return pipeBase.Struct(tracklets=tracklets)
+        sel_three_det, = np.where([len(t.indices()) > 2 for t in collapsed_tracklets])
+        self.write_out_tracklets([collapsed_tracklets[n] for n in sel_three_det],
+                                 "threedet_tracklets_Sept1")
+        print("Number of 3-detection tracklets: {:d}".format(len(sel_three_det)))
+
+        return pipeBase.Struct(tracklets=collapsed_tracklets)
 
     # Overriding these two functions prevent the task from attempting to save the config.
     # Can remove these when we have mapper entries for the config.
