@@ -44,6 +44,9 @@ namespace lsst {
             bool useMinimumRMS, bool useBestFit, 
             bool useRMSFilt, double maxRMS, bool beVerbose);
             
+    void parameterize(const std::vector<MopsDetection> *trackletDets,
+                      std::vector<double> &motionVector,
+                      double normalTime);
     }} // close lsst::mops
 
 #endif
