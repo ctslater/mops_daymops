@@ -13,14 +13,14 @@
 
 /*
  * jmyers feb 2011
- * 
+ *
  * We really want two classes: KDTree and TrackletTree. KDTree supports
  * searching and has non-overlapping nodes and TrackletTree does not support
  * searching but does allow overlapping nodes.
  *
  * BaseKDTree will implement most of the stuff we need for both classes and they
  * will derive from it. Don't use this class on its own!
- * 
+ *
  */
 
 static unsigned int lastId_NULL = 0;
@@ -28,10 +28,10 @@ static unsigned int lastId_NULL = 0;
 namespace lsst {
 namespace mops {
 
-    
+
     template <class T, class RecursiveT>
     class BaseKDTreeNode {
-    public: 
+    public:
         /* create and populate a KDTreeNode.  Caller is trusted that the
          * Ubounds, LBounds provided correspond to the upper and lower
          * bounds of data in each dimension from pointsAndValues.
@@ -39,11 +39,11 @@ namespace mops {
          * automatically sets ref count to 1.
          */
         BaseKDTreeNode(
-            const std::vector<PointAndValue <T> > &pointsAndValues, 
-            unsigned int k, unsigned int maxLeafSize, 
-            unsigned int myAxisToSplit, 
+            const std::vector<PointAndValue <T> > &pointsAndValues,
+            unsigned int k, unsigned int maxLeafSize,
+            unsigned int myAxisToSplit,
             const std::vector<double> &Ubounds,
-            const std::vector<double> &LBounds, 
+            const std::vector<double> &LBounds,
             unsigned int &lastId=lastId_NULL);
 
 
@@ -58,20 +58,20 @@ namespace mops {
         void addReference();
 
         void removeReference();
-        
+
         unsigned int getRefCount();
-        
+
         void debugPrint(int depth) const;
-    
+
         const unsigned int getId() const;
 
-        /* 
+        /*
          * helper functions, should probably not be public... TBD.
          *
          *for a collection of points and values, find the median value
          * along the given axis and return it
          *
-         * ASSUMES all points have size > axis 
+         * ASSUMES all points have size > axis
         */
         double getMedianByAxis(std::vector<PointAndValue<T> > pointsAndValues,
                                unsigned int axis);
@@ -83,10 +83,10 @@ namespace mops {
         const std::vector<double> *getUBounds() const;
         const std::vector<double> *getLBounds() const;
 
-        
+
     protected:
         BaseKDTreeNode() {};
-        std::vector <RecursiveT > myChildren;        
+        std::vector <RecursiveT > myChildren;
         unsigned int myRefCount;
         unsigned int myK;
         std::vector <double> myUBounds;
@@ -99,7 +99,7 @@ namespace mops {
 
 
 template <class T, class RecursiveT>
-const std::vector<double> *BaseKDTreeNode<T, RecursiveT>::getUBounds() 
+const std::vector<double> *BaseKDTreeNode<T, RecursiveT>::getUBounds()
     const
 {
     return &myUBounds;
@@ -107,7 +107,7 @@ const std::vector<double> *BaseKDTreeNode<T, RecursiveT>::getUBounds()
 
 
 template <class T, class RecursiveT>
-const std::vector<double> *BaseKDTreeNode<T, RecursiveT>::getLBounds() 
+const std::vector<double> *BaseKDTreeNode<T, RecursiveT>::getLBounds()
     const
 {
     return &myLBounds;
@@ -151,24 +151,24 @@ unsigned int BaseKDTreeNode<T, RecursiveT>::getRefCount()
 
 template <class T, class RecursiveT>
 BaseKDTreeNode<T, RecursiveT>::BaseKDTreeNode(
-    const std::vector<PointAndValue <T> > &pointsAndValues, 
-    unsigned int k, 
-    unsigned int maxLeafSize,       
-    unsigned int myAxisToSplit, 
-    const std::vector<double> & UBounds, 
+    const std::vector<PointAndValue <T> > &pointsAndValues,
+    unsigned int k,
+    unsigned int maxLeafSize,
+    unsigned int myAxisToSplit,
+    const std::vector<double> & UBounds,
     const std::vector<double> & LBounds,
     unsigned int &lastId)
 {
 
     myRefCount = 1;
-    myK = k;  
+    myK = k;
     myUBounds = UBounds;
     myLBounds = LBounds;
     lastId++;
     id = lastId;
 
 
-    std::vector<double> rightChildUBounds, rightChildLBounds,     
+    std::vector<double> rightChildUBounds, rightChildLBounds,
         leftChildUBounds, leftChildLBounds;
     std::vector<PointAndValue <T> > leftPointsAndValues, rightPointsAndValues;
     double tmpMedian;
@@ -180,40 +180,47 @@ BaseKDTreeNode<T, RecursiveT>::BaseKDTreeNode(
     unsigned int nextAxis;
 
     if (myAxisToSplit >= myK){
-        throw LSST_EXCEPT(BadParameterException, 
+        throw LSST_EXCEPT(BadParameterException,
                           "BaseKDTreeNode: failed sanity check: asked to split data along dimension greater \
 than dimensions of data\n");
     }
 
     if (myUBounds.size() != myLBounds.size()){
-        throw LSST_EXCEPT(ProgrammerErrorException, 
+        throw LSST_EXCEPT(ProgrammerErrorException,
                           "BaseKDTreeNode: failed sanity check: UBounds/LBounds vectors have different size\n");
     }
 
 
-    /* 
+    /*
        if myUBounds[i] == myLBounds[i] for i == 0,..k, but
        pointsAndValues.size() > 1, then ALL POINTS ARE EQUAL.
-     
+
        this means that we need to be a leaf no matter what.
-     
+
        for real-world (LSST) purposes, this should virtually NEVER
        happen, but it is theoretically possible, especially if
        this code is used for discrete values.
     */
     bool forceLeaf = true;
-    for (unsigned int i = 0; 
+    for (unsigned int i = 0;
          (i < myUBounds.size()) && (forceLeaf == true);
-         i++) 
+         i++)
     {
         if (!areEqual(myUBounds[i], myLBounds[i])) {
             forceLeaf = false;
-        } 
+        }
     }
 
+    // CTS
+    // if(pointsAndValues.size() == 0)
+    //    throw LSST_EXCEPT(ProgrammerErrorException, "zero length pointsAndValues in KDTree\n");
 
     tmpMedian = getMedianByAxis(pointsAndValues, myAxisToSplit);
-    /* 
+    if(isnan(tmpMedian)) {
+      abort();
+      throw LSST_EXCEPT(ProgrammerErrorException, "getMedianByAxis returned NaN in BaseKDTreeNode\n");
+    }
+    /*
      * catch the special case John Dailey from WISE found: if the
      * median value is also the max value, we can't just give all
      * values <= the median to the left child; this would be *all*
@@ -248,19 +255,19 @@ than dimensions of data\n");
         leftChildUBounds[myAxisToSplit] = tmpMedian;
 
         leftChildLBounds = LBounds;
-    
+
         //partition data for children
         for (unsigned int i = 0; i < pointsAndValues.size(); i++) {
 
             tmpPointAndValue = pointsAndValues[i];
 
-            if (tmpPointAndValue.getPoint()[myAxisToSplit] <= tmpMedian) { 
+            if (tmpPointAndValue.getPoint()[myAxisToSplit] <= tmpMedian) {
                 leftPointsAndValues.push_back(tmpPointAndValue);
             }
             else {
                 rightPointsAndValues.push_back(tmpPointAndValue);
             }
-      
+
             /* it would be really nice to delete
              * pointsAndValues[i] at this point, but since it
              * holds statically allocated data that's not really
@@ -268,17 +275,17 @@ than dimensions of data\n");
              * (ugh)
              */
         }
-    
+
         nextAxis = (myAxisToSplit + 1) % (myK);
-    
+
         RecursiveT leftChild(leftPointsAndValues, k, maxLeafSize,
-                             nextAxis, 
+                             nextAxis,
                              leftChildUBounds, leftChildLBounds, lastId);
-    
+
         myChildren.push_back(leftChild);
-    
+
         RecursiveT rightChild(rightPointsAndValues, k, maxLeafSize,
-                              nextAxis, rightChildUBounds, 
+                              nextAxis, rightChildUBounds,
                               rightChildLBounds, lastId);
 
         myChildren.push_back(rightChild);
@@ -294,15 +301,15 @@ void BaseKDTreeNode<T, RecursiveT>::debugPrint(int depth) const
     std::cout << "KDTREENODE: Depth "<< depth << std::endl;;
     std::cout << "\tmy dims is "<< myK << std::endl;
     std::vector<double>::iterator myIter;
-    
+
     std::cout << "UBounds: ";
     printDoubleVec(myUBounds);
-    
+
     std::cout << std::endl << "LBounds: ";
     printDoubleVec(myLBounds);
-    
-    if (myChildren.size() == 0) { 
-        
+
+    if (myChildren.size() == 0) {
+
         // we're a leaf node
         typename std::vector<PointAndValue<T>,std::allocator<PointAndValue<T> > >::iterator dataIter;
         for (dataIter = myData.begin(); dataIter != myData.end(); dataIter++)
@@ -314,17 +321,17 @@ void BaseKDTreeNode<T, RecursiveT>::debugPrint(int depth) const
     }
     else {
         //we're a non-leaf, print the children's contents
-        
+
         myChildren[0].debugPrint(depth + 1);
-        myChildren[1].debugPrint(depth + 1);    
+        myChildren[1].debugPrint(depth + 1);
     }
 }
-    
-    
+
+
 template <class T, class RecursiveT>
 double BaseKDTreeNode<T, RecursiveT>::maxByAxis(
-    std::vector<PointAndValue<T> > pointsAndValues, 
-    unsigned int axis) 
+    std::vector<PointAndValue<T> > pointsAndValues,
+    unsigned int axis)
 {
     double tmpMax = 0;
     bool foundMax = false;
@@ -339,7 +346,7 @@ double BaseKDTreeNode<T, RecursiveT>::maxByAxis(
 }
 
 
- 
+
 template <class T, class RecursiveT>
 double BaseKDTreeNode<T, RecursiveT>::getMedianByAxis(
     std::vector<PointAndValue<T> > pointsAndValues,
@@ -349,21 +356,22 @@ double BaseKDTreeNode<T, RecursiveT>::getMedianByAxis(
     std::vector<double> splitAxisPointData;
     typename std::vector<PointAndValue<T>,
         std::allocator<PointAndValue<T> > >::iterator myIter;
-    
-    for (myIter = pointsAndValues.begin(); 
+
+    for (myIter = pointsAndValues.begin();
          myIter != pointsAndValues.end();
          myIter++) {
-        
+
         splitAxisPointData.push_back( myIter->getPoint()[axis]);
-        
+
     }
-    
+
     /*we know that we have at least one element here, so we're fine
      * (fastMedian demands non-empty vector)*/
     tmpMedian = fastMedian(splitAxisPointData);
-  
+    if(isnan(tmpMedian)) throw LSST_EXCEPT(lsst::pex::exceptions::OutOfRangeError, "NaN in KDTree");
+
     return tmpMedian;
-    
+
 }
 
 
