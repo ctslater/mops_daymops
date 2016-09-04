@@ -40,6 +40,7 @@ public:
     // placeholder values from the "getters" - they used to send exceptions in
     // this case, but to save the extra byte, I dropped the "initialized" flag.
     long int getID() const ;
+    long int getIndex() const ;
     long int getImageID() const;
     double getEpochMJD() const ;
     double getRA() const ;
@@ -52,6 +53,7 @@ public:
     double getRaTopoCorr() const ;
 
     void setID(long int newId);
+    void setIndex(long int newId);
     void setImageID(long int);
     void setEpochMJD(double newMjd);
     void setRA(double newRa);
@@ -71,6 +73,7 @@ private:
     static double obsLong;
 
     long int ID;
+    long int index;
     double MJD;
     double RA;
     double dec;

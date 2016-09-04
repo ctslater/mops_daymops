@@ -29,6 +29,8 @@ PYBIND11_PLUGIN(_daymopsLib) {
         .def("calculateTopoCorr", &MopsDetection::calculateTopoCorr)
         .def_property("ID", &MopsDetection::getID,
                 &MopsDetection::setID)
+        .def_property("index", &MopsDetection::getIndex,
+                &MopsDetection::setIndex)
         .def_property("ImageID", &MopsDetection::getImageID,
                 &MopsDetection::setImageID)
         .def_property("EpochMJD", &MopsDetection::getEpochMJD,

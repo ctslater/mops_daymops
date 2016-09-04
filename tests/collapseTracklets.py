@@ -94,6 +94,10 @@ class CollapseTracklets(unittest.TestCase):
                       daymops.MopsDetection(130344998938869950, 5333.0, 13.0, 13.0),
                      ]
 
+        # See tests/findTracklets.py testLongIds()
+        for n, det in enumerate(detections):
+            det.index = n
+
         config  = daymops.findTrackletsConfig()
         config.maxV = 1.5
         config.maxDt = 3.0
@@ -102,8 +106,6 @@ class CollapseTracklets(unittest.TestCase):
         output = daymops.TrackletSet()
 
         tolerances = [0.01, 0.01, 1.0, 0.01]
-        import pdb
-        pdb.set_trace()
         daymops.doCollapsingPopulateOutputVector(detections, tracklets,
                                                  tolerances, output, False,
                                                  False, False, 0.0, False)

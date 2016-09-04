@@ -165,7 +165,7 @@ void generatePerImageTrees(const std::map<double, std::vector<MopsDetection> > &
             pairRADec.push_back(convertToStandardDegrees(thisDetVec->at(j).getDec()));
             
             tempPV.setPoint(pairRADec);
-            tempPV.setValue(thisDetVec->at(j).getID());
+            tempPV.setValue(thisDetVec->at(j).getIndex());
             vecPV.push_back(tempPV);
         }
         
@@ -260,7 +260,7 @@ void getTracklets(std::vector<Tracklet> &results,
                 for (unsigned int ii = 0; ii < closeEnoughResults.size(); ii++) {
                     // collect results for each query point's results for each MJD
                     Tracklet newTracklet;
-                    newTracklet.indices.insert(curQuery->getID());               
+                    newTracklet.indices.insert(curQuery->getIndex());
                     newTracklet.indices.insert(closeEnoughResults.at(ii));
                     results.push_back(newTracklet);
                 }

@@ -42,6 +42,10 @@ MopsDetection::MopsDetection(long int ID, double epochMJD, double RA, double Dec
     this->imageID = obsHistId;
     this->snr = snr;
     this->mag = mag;
+
+    // This is temporary; preserves old behavior where IDs had to be equal to
+    // the position in the detection vector.
+    index = ID;
 }
 
 
@@ -49,6 +53,11 @@ MopsDetection::MopsDetection(long int ID, double epochMJD, double RA, double Dec
 void MopsDetection::setID(long int newId)
 {
     ID = newId;
+}
+
+void MopsDetection::setIndex(long int newIndex)
+{
+    index = newIndex;
 }
 
 void MopsDetection::setImageID(long int newiid) 
@@ -107,6 +116,12 @@ void MopsDetection::setObservatoryLocation(double lat, double longitude)
 long int MopsDetection::getID() const 
 {
     return ID;
+
+}
+
+long int MopsDetection::getIndex() const
+{
+    return index;
 
 }
 

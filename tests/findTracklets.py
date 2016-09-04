@@ -78,3 +78,30 @@ class FindTracklets(unittest.TestCase):
 
         self.assertEqual(len(tracklets), 1)
         self.assertTrue(containsPair(0, 1, tracklets))
+
+    def testLongIDs(self):
+        detections = [daymops.MopsDetection(130344998938869947L, 53736.0, 100.0, 10.0),
+                      daymops.MopsDetection(130344998938869948L, 53737.0, 100.1, 10.1),
+                      daymops.MopsDetection(130344998938869949L, 53738.0, 100.2, 10.2),
+                     ]
+
+        # This is an egregious work-around for the way tracklets currently use
+        # detection IDs as detection array indices. I have temporarily added an
+        # index property that will be used instead of ID by findTracklets().
+        for n, det in enumerate(detections):
+            det.index = n
+
+        config = daymops.findTrackletsConfig()
+        config.maxV = 1.5
+        config.maxDt = 3.0
+        tracklets = daymops.findTracklets(detections, config)
+
+        self.assertEqual(len(tracklets), 3)
+        print(tracklets[0].indices())
+        self.assertTrue(containsPair(0, 1, tracklets))
+        self.assertTrue(containsPair(1, 2, tracklets))
+        self.assertTrue(containsPair(0, 2, tracklets))
+
+if __name__ == "__main__":
+    unittest.main()
+
