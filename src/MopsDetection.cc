@@ -30,7 +30,7 @@ MopsDetection::MopsDetection()
 
 
 
-MopsDetection::MopsDetection(long int ID, double epochMJD, double RA, double Dec, double RaErr, double DecErr, int ssmId, long int obsHistId, double snr, double mag) 
+MopsDetection::MopsDetection(long int ID, double epochMJD, double RA, double Dec, double RaErr, double DecErr, int ssmId, long int imageID, double snr, double mag) 
 {
     this->ID = ID;
     MJD = epochMJD;
@@ -39,7 +39,7 @@ MopsDetection::MopsDetection(long int ID, double epochMJD, double RA, double Dec
     this->RaErr = RaErr;
     this->DecErr = DecErr;
     this->ssmId = ssmId;
-    this->imageID = obsHistId;
+    this->imageID = imageID;
     this->snr = snr;
     this->mag = mag;
 

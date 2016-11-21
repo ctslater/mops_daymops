@@ -23,7 +23,7 @@ PYBIND11_PLUGIN(_daymopsLib) {
         .def(py::init<long int, double, double, double, double, double, int, long int, double, double>(),
                 py::arg("ID"), py::arg("epochMJD"), py::arg("RA"), py::arg("Dec"),
                 py::arg("RaErr") = 0.0, py::arg("DecErr") = 0.0, py::arg("ssmId") = -1,
-                py::arg("obsHistId") = -1, py::arg("snr") = -1, py::arg("mag") = -1)
+                py::arg("ImageID") = -1, py::arg("snr") = -1, py::arg("mag") = -1)
         .def("fromString", &MopsDetection::fromString)
         .def("toString", [](MopsDetection &d) { return "<MopsDetection " + std::to_string((&d)->getID()) + " >"; })
         .def("calculateTopoCorr", &MopsDetection::calculateTopoCorr)
